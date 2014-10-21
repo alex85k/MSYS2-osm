@@ -4,8 +4,8 @@ MSYS2-osm
 To compile OSRM for Windows (MinGW) with MSYS2 environment, the following steps are needed:
 
 1. Download and install MSYS2: http://msys2.github.io/
-2. It contain very good packaging system. Enter its shell ``C:\msys64\mingw64_shell.bat``.
-3. Update the pacakages database
+2. It contains very good packaging system. Enter its shell ``C:\msys64\mingw64_shell.bat``.
+3. Update the packages database
    ```bash
    pacman -Sy
    ```
@@ -39,4 +39,10 @@ To compile OSRM for Windows (MinGW) with MSYS2 environment, the following steps 
    cd ../mingw-w64-libosmpbf-git
    makepkg-mingw -i
    ```
-
+   
+7. Compile OSRM itself:
+   ```bash
+   cd ../mingw-w64-osrm-git
+   makepkg-mingw
+   
+   ```
