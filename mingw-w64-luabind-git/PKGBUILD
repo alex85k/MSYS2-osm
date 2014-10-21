@@ -1,0 +1,42 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+_realname=luabind
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=v0.9.1.142.g2b904b3
+pkgrel=1
+pkgdesc="A library that helps you create bindings between C++ and Lua"
+arch=('any')
+url="http://www.rasterbar.com/products/luabind.html"
+license=("MIT")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-cmake" "git")
+depends=("${MINGW_PACKAGE_PREFIX}-boost" "${MINGW_PACKAGE_PREFIX}-lua")
+options=('strip' 'staticlibs')
+source=("${_realname}"::"git+https://github.com/DennisOSRM/luabind.git")
+md5sums=(SKIP)
+
+pkgver() {
+  cd "$_realname"
+  git describe --tags | sed 's|-|.|g'
+}
+
+
+prepare() {
+  cd "${srcdir}"/${_realname}
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  mkdir -p "${srcdir}/build-${MINGW_CHOST}"
+  cd "${srcdir}/build-${MINGW_CHOST}"
+  ${MINGW_PREFIX}/bin/cmake \
+    -G"MSYS Makefiles" \
+    -DCMAKE_INSTALL_PREFIX=${pkgdir}${MINGW_PREFIX} \
+    -DCMAKE_BUILD_TYPE=Release \
+    ../${_realname}
+  make
+}
+
+package() {
+  cd "${srcdir}/build-${MINGW_CHOST}"
+  make install
+}
