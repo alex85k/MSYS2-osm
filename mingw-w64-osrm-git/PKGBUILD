@@ -1,7 +1,7 @@
 _realname=osrm
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 
-pkgver=v0.4.1.722.gc3aec4f
+pkgver=v0.4.3.259.gb095aae
 
 pkgver() {
   cd "$_realname"
@@ -17,8 +17,7 @@ license=('BSD')
 options=('strip' 'staticlibs')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-cmake" "git")
 depends=("${MINGW_PACKAGE_PREFIX}-libosmpbf" "${MINGW_PACKAGE_PREFIX}-luabind" "${MINGW_PACKAGE_PREFIX}-stxxl" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-zlib")
-#source=("${_realname}"::"git+https://github.com/Project-OSRM/osrm-backend.git#branch=develop")
-source=("${_realname}"::"git+https://github.com/alex85k/Project-OSRM.git#branch=mingw-support")
+source=("${_realname}"::"git+https://github.com/Project-OSRM/osrm-backend.git#branch=develop")
 md5sums=('SKIP')
 
 prepare() {
@@ -33,6 +32,7 @@ build() {
     -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${pkgdir}${MINGW_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXE_LINKER_FLAGS=-lgomp
     -DBoost_USE_STATIC_LIBS=ON \
     ../${_realname}
   make
