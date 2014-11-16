@@ -1,7 +1,8 @@
+# Maintainer: Alexey Kasatkin <alexeikasatkin@gmail.com>
 _realname=osrm
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 
-pkgver=v0.4.3.259.gb095aae
+pkgver=v0.4.1.792.gc75ce21
 
 pkgver() {
   cd "$_realname"
@@ -10,20 +11,16 @@ pkgver() {
 
 pkgrel=1
 
-pkgdesc="OSRM a high-performance routing engine for shortest paths in road networks."
-arch=('i686' 'x86_64')
+pkgdesc="OSRM a high-performance routing engine for shortest paths in road networks (mingw-w64)"
+arch=('any')
 url="http://project-osrm.org/"
 license=('BSD')
 options=('strip' 'staticlibs')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-cmake" "git")
-depends=("${MINGW_PACKAGE_PREFIX}-libosmpbf" "${MINGW_PACKAGE_PREFIX}-luabind" "${MINGW_PACKAGE_PREFIX}-stxxl" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-zlib")
-source=("${_realname}"::"git+https://github.com/Project-OSRM/osrm-backend.git#branch=develop")
+depends=("${MINGW_PACKAGE_PREFIX}-libosmpbf-git" "${MINGW_PACKAGE_PREFIX}-luabind-git" "${MINGW_PACKAGE_PREFIX}-stxxl-git" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-zlib" "${MINGW_PACKAGE_PREFIX}-gdal")
+#source=("${_realname}"::"git+https://github.com/Project-OSRM/osrm-backend.git#branch=develop")
+source=("${_realname}"::"git+https://github.com/alex85k/Project-OSRM.git#branch=mingw-full")
 md5sums=('SKIP')
-
-prepare() {
-  cd "${srcdir}"/${_realname}
-  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
-}
 
 build() {
   mkdir -p "${srcdir}/build-${MINGW_CHOST}"
@@ -32,17 +29,26 @@ build() {
     -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${pkgdir}${MINGW_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_EXE_LINKER_FLAGS=-lgomp
+    -DBUILD_TOOLS=ON \
     -DBoost_USE_STATIC_LIBS=ON \
     ../${_realname}
+
+#    -DSTXXL_LIBRARY=${MINGW_PREFIX}/lib/libstxxl.a \
+#    -DLUA_LIBRARY=${MINGW_PREFIX}/lib/liblua5.1.a \
+#    -DLUABIND_LIBRARY=${MINGW_PREFIX}/lib/libluabind.a \
+#    -DPROTOBUF_LIBRARY=${MINGW_PREFIX}/lib/libprotobuf.a \
+#    -DPROTOBUF_LIBRARY_RELEASE=${MINGW_PREFIX}/lib/libprotobuf.a \
+#    -DBZIP2_LIBRARY_RELEASE=${MINGW_PREFIX}/lib/libbz2.a \
+#    -DZLIB_LIBRARY=${MINGW_PREFIX}/lib/libz.a \
+#    -DGDAL_LIBRARY=${MINGW_PREFIX}/lib/libgdal.a \
+
   make
 }
 
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-#  make install
-#  mkdir -p "${srcdir}/${pkgdir}${MINGW_PREFIX}/usr/share/licenses/$pkgname"
-#  install -Dm644 ../${_realname}/LICENSE_1_0.txt \
-#    "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE_1_0.txt"
+  make install
+  install -d "${pkgdir}${MINGW_PREFIX}"/share/osrm/profiles
+  cp -r ${srcdir}/${_realname}/profiles ${pkgdir}${MINGW_PREFIX}/share/osrm
 }
